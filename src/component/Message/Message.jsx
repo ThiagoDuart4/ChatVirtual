@@ -1,34 +1,76 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import style from "../Message/Message.module.css";
 
 import { useAuthValue } from "../../Context/AuthContext";
-import { collection, query, orderBy, limit, serverTimestamp,addDoc } from "firebase/firestore";
+import { collection, query, orderBy, limit, serverTimestamp, addDoc, getDocs, where } from "firebase/firestore";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { db } from "../../Firebase";
 
-import { useState } from "react";
+
 const Message = () => {
 
+  // usuario conectado
     const {user} = useAuthValue()
 
+const userLogado = user.uid
+
+
+   // Referência da coleção de mensagens
     const messageRef= collection(db,"messages");
-    const QueryMessages = query(messageRef,orderBy('createdAt'), limit(25))
-    const [messages] = useCollectionData(QueryMessages,{idField: "id"})
+    const QueryMessages = query(
+        messageRef,
+        where("recipientId", "==", userLogado),
+        orderBy('createdAt','desc')
+      );
+    
+      // Filtra as mensagens onde o usuário é o remetente (autor)
+      const userQueryMessages = query(
+        messageRef,
+        where('uid', "==", userLogado),
+        orderBy('createdAt')
+      );
+    
+      // Hook para buscar as mensagens onde o usuário é o destinatário
+      const [messages] = useCollectionData(QueryMessages, { idField: "id" });
+     console.log(messages)
+      // Hook para buscar as mensagens onde o usuário é o remetente
+      const [userMessages] = useCollectionData(userQueryMessages, { idField: "id" });
 
-  
+   // Estado para armazenar valor do input e o destinatário
+   const [formValue, setFormValue] = useState('');
+   const [users, setUsers] = useState([]); // Armazena lista de usuários
+   const [selectedRecipientId, setSelectedRecipientId] = useState(''); // Armazena o destinatário selecionado
 
-    const [formValue,setFormValue] = useState()
+    // Função para buscar usuários do Firebase
+    useEffect(() => {
+      const fetchUsers = async () => {
+          const usersCollection = collection(db, 'users');
+          const usersSnapshot = await getDocs(usersCollection);
+          const usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setUsers(usersList);
+      };
+
+      fetchUsers();
+  }, []);
 
     const HandleMessage =  async(e) =>{
         e.preventDefault() 
         const {photoURL,uid} = user
-        
+      
+        if (!selectedRecipientId) {
+          alert("Selecione um destinatário antes de enviar a mensagem");
+          return;
+      }
+
         await addDoc(messageRef,{
             text:formValue,
             uid,
+            recipientId: selectedRecipientId, // Inclui o recipientId
             photoURL,
             createdAt: serverTimestamp()
+
+           
         })
 
         setFormValue('')
@@ -37,21 +79,34 @@ const Message = () => {
 
   return (
     <>
-      <div className={style.message}>
-      {messages && messages.map((msg) => (
-        <div key={msg.uid}>
-          <p>{msg.text}</p>
-          {msg.photoURL && <img src={msg.photoURL} alt={`${msg.userName}'s profile`} />}
-        </div>
-      ))}
-      </div>
-      <div className={style.formMessage}>
-        <form onSubmit={HandleMessage} >
-            <input type="text" value = {formValue} onChange={e => setFormValue (e.target.value)} />
-            <button type="submit" > Enviar</button>
+    <div className={style.message}>
+        {messages && messages.map((msg) => (
+            <div key={msg.id}>
+                <p>{msg.text}</p>
+                {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
+            </div>
+        ))}
+    </div>
+
+    <div className={style.formMessage}>
+        {/* Selecionar destinatário */}
+        <select onChange={(e) => setSelectedRecipientId(e.target.value)}>
+            <option value="">Selecione o destinatário</option>
+            {users.map(user => (
+                <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
+        </select>
+
+        <form onSubmit={HandleMessage}>
+            <input
+                type="text"
+                value={formValue}
+                onChange={(e) => setFormValue(e.target.value)}
+            />
+            <button type="submit">Enviar</button>
         </form>
-      </div>
-    </>
+    </div>
+</>
   );
 };
 

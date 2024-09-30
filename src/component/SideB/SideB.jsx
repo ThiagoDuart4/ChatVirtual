@@ -3,8 +3,11 @@ import style from '../SideB/SideB.module.css'
 import {signOut  } from "firebase/auth"; 
 import { auth} from "../../Firebase";
 import { useState } from 'react';
+import { useAuthValue } from "../../Context/AuthContext";
 
 const SideBar = () => {
+
+  const {user} = useAuthValue()
 
   const [loading,setLoading] = useState(false)
 
@@ -25,6 +28,10 @@ const SideBar = () => {
 
   return (
     <div className={style.SideBar}>
+        <p>{user.displayName}</p>
+      <p>{user.email}</p>
+
+      <img src={user.photoURL} alt="Profile" />
    <h1>Teste</h1>
       <button onClick={logout} disabled={loading}>
         {loading ? 'Saindo...' : 'Sair'}
