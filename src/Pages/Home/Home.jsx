@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react' 
 import { useAuthValue } from "../../Context/AuthContext";
 import style from '../Home/Home.module.css'
 
@@ -7,7 +7,12 @@ import Message from '../../component/Message/Message';
 
 const Home = () => {
 
+  const [recipientId, setRecipientId] = useState(null);
 
+
+  const handleRecipientIdChange = (newRecipientId) => {
+    setRecipientId(newRecipientId); // Atualiza o estado do pai
+};
 
   const {user} = useAuthValue()
 
@@ -15,8 +20,8 @@ const Home = () => {
   return (
     <div className={style.home}>
 
-      <SideBar/>
-      <Message/>
+      <SideBar onRecipientIdChange={handleRecipientIdChange}  />
+      <Message testeId={recipientId}  />
     </div>
   )
 }
