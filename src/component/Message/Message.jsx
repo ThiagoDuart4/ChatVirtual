@@ -8,35 +8,49 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { db } from "../../Firebase";
 
 
-const Message = () => {
+const Message = ({testeId}) => {
 
   // usuario conectado
     const {user} = useAuthValue()
 
 const userLogado = user.uid
 
-
+ console.log(testeId)
    // Referência da coleção de mensagens
     const messageRef= collection(db,"messages");
-    const QueryMessages = query(
+ 
+
+      const QueryMessages = userLogado  && testeId ? query(
         messageRef,
-        where("recipientId", "==", userLogado),
-        orderBy('createdAt','desc')
-      );
+        where("recipientId", "==", userLogado), 
+          where("recipientId", "==",testeId ),
+        orderBy("createdAt", "desc")
+      ) : null;
+    
     
       // Filtra as mensagens onde o usuário é o remetente (autor)
       const userQueryMessages = query(
         messageRef,
         where('uid', "==", userLogado),
-        orderBy('createdAt')
       );
     
       // Hook para buscar as mensagens onde o usuário é o destinatário
       const [messages] = useCollectionData(QueryMessages, { idField: "id" });
-     console.log(messages)
+
       // Hook para buscar as mensagens onde o usuário é o remetente
       const [userMessages] = useCollectionData(userQueryMessages, { idField: "id" });
+      console.log(userMessages)
 
+  // Combina as mensagens e remove duplicatas
+  const combinedMessages = [...(messages || []), ...(userMessages || [])];
+
+
+
+
+  // Ordena o array combinado pela data de criação (createdAt)
+  const sortedMessages = combinedMessages.sort((a, b) => {
+    return a.createdAt?.seconds - b.createdAt?.seconds; // Ordena em ordem crescente
+  });
    // Estado para armazenar valor do input e o destinatário
    const [formValue, setFormValue] = useState('');
    const [users, setUsers] = useState([]); // Armazena lista de usuários
@@ -79,13 +93,13 @@ const userLogado = user.uid
 
   return (
     <>
-    <div className={style.message}>
-        {messages && messages.map((msg) => (
-            <div key={msg.id}>
-                <p>{msg.text}</p>
-                {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
-            </div>
-        ))}
+  <div>
+      {sortedMessages.map((msg) => (
+        <div key={msg.id}>
+          <p>{msg.text}</p>
+          {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
+        </div>
+      ))}
     </div>
 
     <div className={style.formMessage}>
