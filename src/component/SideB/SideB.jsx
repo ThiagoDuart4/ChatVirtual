@@ -12,6 +12,7 @@ import { db } from "../../Firebase";
 const SideBar = ({ onRecipientIdChange }) => {
 
   const {user} = useAuthValue()
+  const userLogado = user.uid
 
   const [loading,setLoading] = useState(false)
 
@@ -62,12 +63,12 @@ const SideBar = ({ onRecipientIdChange }) => {
         {loading ? 'Saindo...' : 'Sair'}
       </button>
 
-        {/* Selecionar destinatário */}
+        Selecionar destinatário
         <select onChange={(e) => setBuscarRecipientId(e.target.value)}>
             <option value="">Selecione o destinatário</option>
-            {users.map(user => (
-                <option key={user.id} value={user.id}>{user.name}</option>
-            ))}
+      {users.filter(user => user.id !== userLogado).map(user=>(
+        <option key={user.id} value={user.id}>{user.name}</option>
+      ))}
         </select>
 
     </div>

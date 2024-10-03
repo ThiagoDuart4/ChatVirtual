@@ -1,0 +1,42 @@
+
+    // mensagem que vem de outro usuario para mim
+    const QueryMessagesForUser = userLogado && testeId? query(
+      messageRef,
+      where("recipientId", "==", userLogado),
+      orderBy("createdAt", "desc")
+    ) : null;
+    
+    // Verificando na consulta  se o que esta dentro de recipientID é igual  testeId e me entregar apenas o que estiver dentro desses parametros
+
+    const QueryMessagesForTesteId = testeId  && userLogado? query(
+      messageRef,
+      where("recipientId", "==", testeId),
+      orderBy("createdAt", "desc")
+    ) : null;
+    
+    
+// procurando mensagens que eu enviei
+      const userQueryMessages =   testeId  && userLogado? query(
+        messageRef,
+        where('uid', "==", userLogado),
+      ): null;
+
+      const [messages] = useCollectionData(QueryMessagesForUser, { idField: "id" });
+
+      // Hook para buscar as mensagens onde o usuário é o remetente
+      const [userMessages] = useCollectionData(userQueryMessages, { idField: "id" });
+
+      const [messageTestId] = useCollectionData(QueryMessagesForTesteId, { idField: "id" });
+
+    
+      
+  // Combina as mensagens 
+  const combinedMessages = [...(messages || []), ...(userMessages || []),...(messageTestId|| [])];
+
+console.log(messages,userMessages,messageTestId)
+  // Ordena o array combinado pela data de criação (createdAt)
+  const sortedMessages = combinedMessages.sort((a, b) => {
+    return a.createdAt?.seconds - b.createdAt?.seconds; // Ordena em ordem crescente
+  });
+
+

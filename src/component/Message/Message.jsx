@@ -12,50 +12,29 @@ const Message = ({testeId}) => {
 
   // usuario conectado
     const {user} = useAuthValue()
+    const userLogado = user.uid
 
-const userLogado = user.uid
 
- console.log(testeId)
    // Referência da coleção de mensagens
     const messageRef= collection(db,"messages");
- 
 
-      const QueryMessages = userLogado  && testeId ? query(
-        messageRef,
-        where("recipientId", "==", userLogado), 
-          where("recipientId", "==",testeId ),
-        orderBy("createdAt", "desc")
-      ) : null;
-    
-    
-      // Filtra as mensagens onde o usuário é o remetente (autor)
-      const userQueryMessages = query(
-        messageRef,
-        where('uid', "==", userLogado),
-      );
-    
-      // Hook para buscar as mensagens onde o usuário é o destinatário
-      const [messages] = useCollectionData(QueryMessages, { idField: "id" });
+  // Filtrando mensagens entre o usuário logado e o destinatário selecionado
+  const messagesQuery = testeId && userLogado ?  query(
+    messageRef,
+    where("recipientId", "in", [userLogado, testeId]),
+    where("uid", "in", [userLogado, testeId]),
+    orderBy("createdAt", "desc") 
+  ):null ;
 
-      // Hook para buscar as mensagens onde o usuário é o remetente
-      const [userMessages] = useCollectionData(userQueryMessages, { idField: "id" });
-      console.log(userMessages)
-
-  // Combina as mensagens e remove duplicatas
-  const combinedMessages = [...(messages || []), ...(userMessages || [])];
+  // Usando o hook para pegar as mensagens
+  const [messages] = useCollectionData(messagesQuery, { idField: "id" });
 
 
-
-
-  // Ordena o array combinado pela data de criação (createdAt)
-  const sortedMessages = combinedMessages.sort((a, b) => {
-    return a.createdAt?.seconds - b.createdAt?.seconds; // Ordena em ordem crescente
-  });
    // Estado para armazenar valor do input e o destinatário
    const [formValue, setFormValue] = useState('');
    const [users, setUsers] = useState([]); // Armazena lista de usuários
-   const [selectedRecipientId, setSelectedRecipientId] = useState(''); // Armazena o destinatário selecionado
 
+  
     // Função para buscar usuários do Firebase
     useEffect(() => {
       const fetchUsers = async () => {
@@ -68,11 +47,12 @@ const userLogado = user.uid
       fetchUsers();
   }, []);
 
+  // Enviando mensagem para destinatario
     const HandleMessage =  async(e) =>{
         e.preventDefault() 
         const {photoURL,uid} = user
       
-        if (!selectedRecipientId) {
+        if (!testeId) {
           alert("Selecione um destinatário antes de enviar a mensagem");
           return;
       }
@@ -80,7 +60,7 @@ const userLogado = user.uid
         await addDoc(messageRef,{
             text:formValue,
             uid,
-            recipientId: selectedRecipientId, // Inclui o recipientId
+            recipientId: testeId, // Inclui o recipientId
             photoURL,
             createdAt: serverTimestamp()
 
@@ -93,35 +73,39 @@ const userLogado = user.uid
 
   return (
     <>
-  <div>
-      {sortedMessages.map((msg) => (
-        <div key={msg.id}>
-          <p>{msg.text}</p>
-          {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
+    {testeId && userLogado ? (
+      <div>
+        <div className={style.messageContainer}>
+          {/* Renderizando as mensagens */}
+          {messages && messages.length > 0 ? (
+            messages.map((msg) => (
+              <div key={msg.id} className={style.message}>
+                <strong>{msg.uid === userLogado ? "Você" : users.find(u => u.id === msg.uid)?.name}:</strong>
+                <p>{msg.text}</p>
+                {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
+              </div>
+            ))
+          ) : (
+            <p>Nenhuma mensagem encontrada.</p>
+          )}
         </div>
-      ))}
-    </div>
 
-    <div className={style.formMessage}>
-        {/* Selecionar destinatário */}
-        <select onChange={(e) => setSelectedRecipientId(e.target.value)}>
-            <option value="">Selecione o destinatário</option>
-            {users.map(user => (
-                <option key={user.id} value={user.id}>{user.name}</option>
-            ))}
-        </select>
-
-        <form onSubmit={HandleMessage}>
+        <div className={style.formMessage}>
+          <form onSubmit={HandleMessage}>
             <input
-                type="text"
-                value={formValue}
-                onChange={(e) => setFormValue(e.target.value)}
+              type="text"
+              value={formValue}
+              onChange={(e) => setFormValue(e.target.value)}
+              placeholder="Digite sua mensagem..."
             />
             <button type="submit">Enviar</button>
-        </form>
-    </div>
-</>
+          </form>
+        </div>
+      </div>
+    ) : null}
+  </>
   );
 };
 
 export default Message;
+
