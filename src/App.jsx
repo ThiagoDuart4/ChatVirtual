@@ -9,7 +9,7 @@ import Login from './Pages/Login/Login'
 
 import { AuthProvider } from '../src/Context/AuthContext';
 
-
+import backgroundImage from '../src/assets/background2.svg';
 function App() {
 
 
@@ -21,8 +21,19 @@ function App() {
     })
    },[auth])
 
+
+
+  const styles = {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',    
+    backgroundPosition: 'center', 
+    backgroundRepeat: 'no-repeat', 
+    height: '100vh', 
+    width: '100vw'
+  };
+
   return (
-    <div className='App'>
+    <div className='App' style={styles} >
       <AuthProvider value={{user}}>
       <BrowserRouter>
                <Routes>
