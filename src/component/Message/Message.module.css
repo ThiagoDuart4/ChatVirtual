@@ -1,0 +1,14 @@
+.messageContainer{
+    width: 35%;
+    max-width: 415px;
+    background-color: white;
+    height: 500px; 
+  
+}
+
+.formMessage{
+    width: 40%;
+    border: 1px solid red;
+    bottom:50px ;
+    position:  fixed;
+}

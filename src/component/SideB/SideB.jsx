@@ -13,7 +13,7 @@ const SideBar = ({ onRecipientIdChange }) => {
 
   const {user} = useAuthValue()
   const userLogado = user.uid
-
+console.log(user)
   const [loading,setLoading] = useState(false)
 
   const [users, setUsers] = useState([]); // Armazena lista de usuários 
