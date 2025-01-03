@@ -1,6 +1,10 @@
 .messageContainer{
     width: 100%;
     margin-top: 60px;
+    margin-bottom: 60px;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
 }
 
 .formMessage{  
@@ -82,3 +86,30 @@ height: 100%;
     font-size: 0.9em;
     color: #0066ff;
 }
+.userMessage {
+
+    display: flex;
+    justify-content: end;
+    
+}
+.otherMessage{
+  
+}
+
+
+.userMessage p , .otherMessage p {
+    padding: 10px;
+    margin-bottom: 10px;
+
+    display: inline-block;
+    text-align: center;
+}
+
+.userMessage p {    border-radius: 10px  10px     0px   10px ;
+
+ background-color: #0066ff;
+color: rgb(224, 223, 223);
+} 
+
+.otherMessage p {     border-radius: 10px  10px     10px   0px ; background-color: #DEDEDE;
+color: #0066ff;}

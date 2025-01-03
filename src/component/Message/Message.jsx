@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef} from "react";
 import style from "../Message/Message.module.css";
 
 import { useAuthValue } from "../../Context/AuthContext";
@@ -76,6 +76,13 @@ const checkReceptorStatus = async () =>{
   // Usando o hook para pegar as mensagens
   const [messages] = useCollectionData(messagesQuery, { idField: "id" });
 
+    // Referência para o contêiner de mensagens
+    const messagesEndRef = useRef(null);
+
+    useEffect (()=>{
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });}
+    },[messages])
 
    // Estado para armazenar valor do input e o destinatário
    const [formValue, setFormValue] = useState('');
@@ -139,18 +146,16 @@ const checkReceptorStatus = async () =>{
         <div className={style.messageContainer}>
           {/* Renderizando as mensagens */}
           {messages && messages.length > 0 ? (
-            messages.map((msg) => (
-              <div key={msg.id} className={style.message}>
-                <strong>{msg.uid === userLogado ? "Você" : users.find(u => u.id === msg.uid)?.name}:</strong>
+            messages.map((msg,key) => (
+              <div key={key} className={ msg.uid === userLogado ? style.userMessage : style.otherMessage}> 
                 <p>{msg.text}</p>
-                {msg.photoURL && <img src={msg.photoURL} alt="Profile" />}
               </div>
             ))
           ) : (
-              <p>....</p>
+              <p>Envie uma mensagem para este usuario</p>
           )}
         </div>
-
+          <div ref={messagesEndRef}></div>
         <div className={style.formMessage}>
           <form onSubmit={HandleMessage}>
             <input
