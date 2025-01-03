@@ -124,9 +124,9 @@ const checkReceptorStatus = async () =>{
     <>
     {testeId && userLogado ? (<div className={style.DestinatarioUser}> 
         <img src={ReceptorUser.photoURL} alt="" />
-        <div>
+        <div className={style.DestinatarioUserName}>
           <h4>{ReceptorUser.name}</h4>
-          <span>{receptorStatus}</span>
+          <p>{receptorStatus}</p>
         </div>
        </div>):(
             <div className={style.NotFoudDestinatario}>
