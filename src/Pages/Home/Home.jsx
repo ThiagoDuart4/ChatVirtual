@@ -4,6 +4,7 @@ import style from "../Home/Home.module.css";
 
 import SideBar from "../../component/SideB/SideB";
 import Message from "../../component/Message/Message";
+import useConecct from "../../useConect";
 
 const Home = () => {
   const [recipientId, setRecipientId] = useState(null);
@@ -11,6 +12,7 @@ const Home = () => {
   const handleRecipientIdChange = (newRecipientId) => {
     setRecipientId(newRecipientId); // Atualiza o estado do pai
   };
+  useConecct()
 
   const { user } = useAuthValue();
 

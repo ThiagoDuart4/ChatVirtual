@@ -6,6 +6,7 @@ import { auth} from"../../Firebase";
 import { useState,useEffect } from 'react';
 import { useAuthValue } from "../../Context/AuthContext";
 import { db } from "../../Firebase";
+ import useConecct from '../../useConect'
 
 
 
@@ -13,11 +14,15 @@ const SideBar = ({ onRecipientIdChange }) => {
 
   const {user} = useAuthValue()
   const userLogado = user.uid
-console.log(user)
+
   const [loading,setLoading] = useState(false)
 
   const [users, setUsers] = useState([]); // Armazena lista de usuários 
+
+ 
+
   const [buscarRecipientId, setBuscarRecipientId] = useState()
+ 
     // Função para buscar usuários do Firebase
     useEffect(() => {
       const fetchUsers = async () => {

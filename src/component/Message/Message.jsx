@@ -3,6 +3,9 @@ import style from "../Message/Message.module.css";
 
 import { useAuthValue } from "../../Context/AuthContext";
 import { collection, query, orderBy, limit, serverTimestamp, addDoc, getDocs, where } from "firebase/firestore";
+
+import { getDatabase, ref, get } from "firebase/database";
+
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { db } from "../../Firebase";
@@ -10,10 +13,54 @@ import { db } from "../../Firebase";
 
 const Message = ({testeId}) => {
 
+ 
+
   // usuario conectado
     const {user} = useAuthValue()
     const userLogado = user.uid
 
+// Função para verificar o status do usuário
+
+const [userStatus, setUserStatus] = useState();
+
+const checkUserStatus = async () =>{
+  const db = getDatabase();
+  const userStatusRef = ref(db, `/onlineStatus/${userLogado}`);
+  const snapshot = await get(userStatusRef);
+  if (snapshot.exists()) {
+    const isOnline = snapshot.val();
+
+    if (isOnline) {
+      setUserStatus('online')
+    } else {
+      setUserStatus('offline')
+    }
+    // console.log(`O usuário ${userLogado} está ${isOnline ? 'online' : 'offline'}.`);
+  } else {
+    console.log('Usuário não encontrado.');
+  }
+ }
+ checkUserStatus()
+
+ // Função para verificar o status do usuário
+ const [receptorStatus, setReceptorStatus] = useState();
+
+const checkReceptorStatus = async () =>{
+  const db = getDatabase();
+  const userStatusRef = ref(db, `/onlineStatus/${testeId}`);
+  const snapshot = await get(userStatusRef);
+  if (snapshot.exists()) {
+    const isOnline = snapshot.val();
+    if (isOnline) {
+      setReceptorStatus('online')
+    } else {
+      setReceptorStatus('offline')
+    }
+  } else {
+    console.log('Usuário não encontrado.');
+  }
+ }
+ checkReceptorStatus()
 
    // Referência da coleção de mensagens
     const messageRef= collection(db,"messages");
@@ -70,9 +117,23 @@ const Message = ({testeId}) => {
         setFormValue('')
     }
  
+     const ReceptorUser =  users.find(u => u.id === testeId)
 
+     
   return (
     <>
+    {testeId && userLogado ? (<div className={style.DestinatarioUser}> 
+        <img src={ReceptorUser.photoURL} alt="" />
+        <div>
+          <h4>{ReceptorUser.name}</h4>
+          <span>{receptorStatus}</span>
+        </div>
+       </div>):(
+            <div className={style.NotFoudDestinatario}>
+              <h1>Destinatário não encontrado!</h1>
+             <span>Selecione um destinatario</span>
+            </div>
+          )}
     {testeId && userLogado ? (
       <div>
         <div className={style.messageContainer}>
@@ -86,7 +147,7 @@ const Message = ({testeId}) => {
               </div>
             ))
           ) : (
-            <p>Nenhuma mensagem encontrada.</p>
+              <p>....</p>
           )}
         </div>
 
