@@ -24,7 +24,7 @@ function App() {
 
 
   const styles = {
-    backgroundImage: `url(${backgroundImage})`,
+    backgroundImage: `url(/wave-haikei.svg)`,
     backgroundSize: 'cover',    
     backgroundPosition: 'center', 
     backgroundRepeat: 'no-repeat', 
