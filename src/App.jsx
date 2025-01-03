@@ -9,7 +9,7 @@ import Login from './Pages/Login/Login'
 
 import { AuthProvider } from '../src/Context/AuthContext';
 
-import backgroundImage from '../public/background2.svg'; 
+import backgroundImage from '../public/wave-haikei.svg'; 
 function App() {
 
 
