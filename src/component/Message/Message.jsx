@@ -1,5 +1,6 @@
 import React, { useState, useEffect,useRef} from "react";
 import style from "../Message/Message.module.css";
+import { BiChevronRight } from "react-icons/bi";
 
 import { useAuthValue } from "../../Context/AuthContext";
 import { collection, query, orderBy, limit, serverTimestamp, addDoc, getDocs, where } from "firebase/firestore";
@@ -11,9 +12,9 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { db } from "../../Firebase";
 
 
-const Message = ({testeId}) => {
+const Message = ({testeId , endMessageId}) => {
 
- 
+
 
   // usuario conectado
     const {user} = useAuthValue()
@@ -35,7 +36,7 @@ const checkUserStatus = async () =>{
     } else {
       setUserStatus('offline')
     }
-    // console.log(`O usuário ${userLogado} está ${isOnline ? 'online' : 'offline'}.`);
+  
   } else {
     console.log('Usuário não encontrado.');
   }
@@ -75,6 +76,10 @@ const checkReceptorStatus = async () =>{
 
   // Usando o hook para pegar as mensagens
   const [messages] = useCollectionData(messagesQuery, { idField: "id" });
+
+endMessageId(messages)
+
+
 
     // Referência para o contêiner de mensagens
     const messagesEndRef = useRef(null);
@@ -164,7 +169,8 @@ const checkReceptorStatus = async () =>{
               onChange={(e) => setFormValue(e.target.value)}
               placeholder="Digite sua mensagem..."
             />
-            <button type="submit">Enviar</button>
+ 
+            <BiChevronRight  className={style.buttonForm} type="submit" />
           </form>
         </div>
       </div>

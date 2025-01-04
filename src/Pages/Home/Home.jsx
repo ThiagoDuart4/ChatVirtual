@@ -8,13 +8,21 @@ import useConecct from "../../useConect";
 
 const Home = () => {
   const [recipientId, setRecipientId] = useState(null);
+  const [message,setMessage] = useState()
 
   const handleRecipientIdChange = (newRecipientId) => {
     setRecipientId(newRecipientId); // Atualiza o estado do pai
   };
+
   useConecct()
 
   const { user } = useAuthValue();
+
+   const endMessage = (messages) =>{
+    setMessage(messages)
+   }
+
+
 
   return (
     <div className={style.homePage}>
@@ -22,12 +30,12 @@ const Home = () => {
       
         <div className={style.socialSection}>
           <section className={style.sidebarSection}>
-            {" "}
-            <SideBar onRecipientIdChange={handleRecipientIdChange} />
+      
+            <SideBar onRecipientIdChange={handleRecipientIdChange}  userMessage = {message}  />
           </section>
-          <section className={style.messageSection}>
-            {" "}
-            <Message testeId={recipientId} />
+          <section className={style.messageSection} >
+        
+            <Message testeId={recipientId} endMessageId={endMessage}/>
           </section>
         </div>
       </div>

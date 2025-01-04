@@ -33,12 +33,22 @@
     transition: 0.4s;
 }
 
-.formMessage button{
+.formMessage .buttonForm{
     position: absolute;
-right: 30px;
-top: 20px;
+right: 20px;
+top: 17px;
+font-size: 1.8em;
+color: #0066ff;
+cursor: pointer;
+
 }
 
+
+.formMessage .buttonForm :hover{
+    font-size: 3em;
+    transition: 0.4s;
+    color: #002233;
+}
 .DestinatarioUser{
     position: absolute;
     display: flex;

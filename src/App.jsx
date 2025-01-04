@@ -15,6 +15,7 @@ function App() {
 
 
   const [user,setUser] = useState()
+  
   useEffect(()=>{
     onAuthStateChanged(auth,(user)=>{
      setUser(user)

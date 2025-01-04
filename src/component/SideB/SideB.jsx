@@ -10,16 +10,18 @@ import { db } from "../../Firebase";
 
 
 
-const SideBar = ({ onRecipientIdChange }) => {
+const SideBar = ({ onRecipientIdChange,userMessage }) => {
 
   const {user} = useAuthValue()
   const userLogado = user.uid
+
+  //  mensagem dos usuarios 
+  const messagemDosUser = userMessage
 
   const [loading,setLoading] = useState(false)
 
   const [users, setUsers] = useState([]); // Armazena lista de usuários 
 
- 
 
   const [buscarRecipientId, setBuscarRecipientId] = useState()
  
@@ -57,6 +59,12 @@ const SideBar = ({ onRecipientIdChange }) => {
       });
   };
 
+
+  const handleUserClick = (recipientId) => {
+    setBuscarRecipientId(recipientId); // Atualiza o estado com o ID do destinatário
+ 
+  };
+
   return (
     <div className={style.SideBar}>
         <p>{user.displayName}</p>
@@ -67,14 +75,23 @@ const SideBar = ({ onRecipientIdChange }) => {
       <button onClick={logout} disabled={loading}>
         {loading ? 'Saindo...' : 'Sair'}
       </button>
+ <h3> Selecionar Destinatario</h3>
+      {users
+        .filter((user) => user.id !== userLogado) // Exclui o usuário logado da lista
+        .map((user) => (
+          <button
+            key={user.id}
+            onClick={() => handleUserClick(user.id)} // Envia o ID do usuário ao clicar
+            className={style.UserButton}
+          >
+            {user.name}
+           
+          </button>
+        ))}
 
-        Selecionar destinatário
-        <select onChange={(e) => setBuscarRecipientId(e.target.value)}>
-            <option value="">Selecione o destinatário</option>
-      {users.filter(user => user.id !== userLogado).map(user=>(
-        <option key={user.id} value={user.id}>{user.name}</option>
-      ))}
-        </select>
+    
+      
+      
 
     </div>
   )
